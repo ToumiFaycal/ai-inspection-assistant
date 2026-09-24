@@ -23,3 +23,9 @@ Documentation and material consulted while building this project, grouped by top
 - [Ultralytics: data augmentation guide](https://docs.ultralytics.com/guides/yolo-data-augmentation/): what each augmentation setting (`scale`, `erasing`, `flipud`, `fliplr`, `auto_augment`) does.
 - [torchvision `RandomErasing`](https://docs.pytorch.org/vision/stable/generated/torchvision.transforms.RandomErasing.html): the black rectangles in the training batches, which can hide a defect.
 - [torchvision `RandAugment`](https://docs.pytorch.org/vision/stable/generated/torchvision.transforms.RandAugment.html): the random rotations and colour changes applied to training images.
+- [Zhong et al. (2017), *Random Erasing Data Augmentation*](https://arxiv.org/abs/1708.04896): the paper behind random erasing, which simulates objects being partly hidden.
+- [Cubuk et al. (2019), *RandAugment: Practical automated data augmentation with a reduced search space*](https://arxiv.org/abs/1909.13719): the paper behind RandAugment.
+
+## Image preprocessing
+
+- [NumPy: indexing and slicing](https://numpy.org/doc/stable/user/basics.indexing.html): cropping an image with `frame[y1:y2, x1:x2]` in `src/preprocess.py`.

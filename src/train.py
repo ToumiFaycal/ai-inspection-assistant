@@ -14,16 +14,16 @@ from pathlib import Path
 from ultralytics import YOLO
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = PROJECT_ROOT / "data" / "caps"  # contains train/, val/ and test/
+DATA_DIR = PROJECT_ROOT / "data" / "caps_roi"  # contains train/, val/ and test/ cropped version
 RUNS_DIR = PROJECT_ROOT / "runs"
 
 BASE_MODEL = "yolo26n-cls.pt"  # newest nano classification model, pretrained on ImageNet
-RUN_NAME = "baseline"  # change it for each new experiment, so old results are kept
+RUN_NAME = "roi_square"  # change it for each new experiment, so old results are kept
 
 
 def main():
     model = YOLO(BASE_MODEL)
-    model.train(data=str(DATA_DIR), epochs=50, imgsz=224, batch=16, patience=10, seed=0, device=0, project=str(RUNS_DIR), name=RUN_NAME, exist_ok=True)
+    model.train(data=str(DATA_DIR), epochs=50, imgsz=224, batch=16, patience=10, seed=0, device=0, project=str(RUNS_DIR), name=RUN_NAME, exist_ok=True, erasing=0.0, scale=0.0, flipud=0.5)
     print(f"Best weights saved to: {model.trainer.best}")
 
 
