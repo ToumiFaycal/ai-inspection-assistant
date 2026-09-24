@@ -12,8 +12,9 @@ from pathlib import Path
 
 import cv2
 
+from camera import CAMERA_SOURCE, open_camera
+
 SPLIT = "train"  # "train", "val" or "test": change before each photo session
-CAMERA_INDEX = 0
 
 # Project root = the folder above src/, so the script works from any terminal folder.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -51,9 +52,9 @@ def main():
 
     make_folders()
 
-    cap = cv2.VideoCapture(CAMERA_INDEX, cv2.CAP_DSHOW)
+    cap = open_camera()
     if not cap.isOpened():
-        sys.exit(f"Could not open camera {CAMERA_INDEX}.")
+        sys.exit(f"Could not open camera {CAMERA_SOURCE}.")
 
     print(f"Saving into {DATA_DIR / SPLIT}")
     print("Keys: g = good, d = defective, e = empty, q = quit")

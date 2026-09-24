@@ -1,28 +1,31 @@
-"""Quick webcam check: shows the live feed so we know which camera index works.
+"""Quick camera check: shows the live feed so we can check the camera works.
 
 Usage:
-    python src/camera_test.py      # tries camera 0
-    python src/camera_test.py 1    # tries camera 1
+    python src/camera_test.py        # the default camera from camera.py (the phone)
+    python src/camera_test.py 0      # laptop webcam, by index
+    python src/camera_test.py http://192.168.100.5:8080/video   # any stream URL
 Press q in the video window to quit.
 """
 import sys
 
 import cv2
 
+from camera import CAMERA_SOURCE, open_camera
+
 
 def main():
-    camera_index = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+    source = sys.argv[1] if len(sys.argv) > 1 else CAMERA_SOURCE
+    if isinstance(source, str) and source.isdigit():
+        source = int(source)  # "0" typed in the terminal is text: turn it into the number 0
 
-    # CAP_DSHOW = DirectShow backend. On Windows it opens the camera much faster
-    # than the default backend (MSMF), which can hang for several seconds.
-    cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
+    cap = open_camera(source)
     if not cap.isOpened():
-        print(f"Could not open camera {camera_index}. Try another index, e.g. 1.")
+        print(f"Could not open camera {source}.")
         sys.exit(1)
 
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    print(f"Camera {camera_index} opened at {width}x{height}. Press q to quit.")
+    print(f"Camera {source} opened at {width}x{height}. Press q to quit.")
 
     while True:
         ok, frame = cap.read()  # frame is a NumPy array of shape (height, width, 3), BGR order
@@ -30,7 +33,7 @@ def main():
             print("Failed to read a frame.")
             break
 
-        cv2.imshow(f"Camera {camera_index}", frame)
+        cv2.imshow("Camera test", frame)
 
         # waitKey(1) waits 1 ms for a key press and lets the window refresh.
         if cv2.waitKey(1) & 0xFF == ord("q"):
