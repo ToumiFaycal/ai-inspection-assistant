@@ -1,1 +1,8 @@
 opencv-python==5.0.0.93
+ultralytics==8.4.161
+
+# PyTorch GPU build (CUDA 13.0). On Windows a plain `pip install torch` gives the
+# CPU-only build, so install these two first, from PyTorch's own server:
+#   pip install torch==2.14.0 torchvision==0.29.0 --index-url https://download.pytorch.org/whl/cu130
+torch==2.14.0
+torchvision==0.29.0
