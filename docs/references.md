@@ -26,6 +26,12 @@ Documentation and material consulted while building this project, grouped by top
 - [Zhong et al. (2017), *Random Erasing Data Augmentation*](https://arxiv.org/abs/1708.04896): the paper behind random erasing, which simulates objects being partly hidden.
 - [Cubuk et al. (2019), *RandAugment: Practical automated data augmentation with a reduced search space*](https://arxiv.org/abs/1909.13719): the paper behind RandAugment.
 
+## Evaluation
+
+- [Ultralytics: predict mode](https://docs.ultralytics.com/modes/predict/): running a trained model on images and reading `result.probs` for classification.
+- [Google ML Crash Course: accuracy, precision, recall](https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall): the metrics printed by `src/evaluate.py`.
+- [Google ML Crash Course: thresholds and the confusion matrix](https://developers.google.com/machine-learning/crash-course/classification/thresholding): how moving a decision threshold trades missed defects against false alarms.
+
 ## Image preprocessing
 
 - [NumPy: indexing and slicing](https://numpy.org/doc/stable/user/basics.indexing.html): cropping an image with `frame[y1:y2, x1:x2]` in `src/preprocess.py`.
