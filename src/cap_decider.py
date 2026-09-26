@@ -98,6 +98,14 @@ class CapDecider:
 
         return None
 
+    def agreement(self, decision):
+        """Share of the frames in the voting window that said `decision` (0.0 to 1.0).
+
+        Right after a decision, this is how strongly the frames backed it:
+        e.g. 15 of 15 frames -> 1.0, 12 of 15 -> 0.8, and lower for an "unsure" reject.
+        """
+        return list(self.window).count(decision) / len(self.window)
+
 
 def repeat(answer, count, moving=False):
     """`count` identical frames, as (answer, moving) pairs. Example: repeat("empty", 10)."""

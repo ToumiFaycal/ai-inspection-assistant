@@ -36,6 +36,14 @@ Documentation and material consulted while building this project, grouped by top
 - [Google ML Crash Course: accuracy, precision, recall](https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall): the metrics printed by `src/evaluate.py`.
 - [Google ML Crash Course: thresholds and the confusion matrix](https://developers.google.com/machine-learning/crash-course/classification/thresholding): how moving a decision threshold trades missed defects against false alarms.
 
+## Decision log (database)
+
+- [Python `sqlite3` module](https://docs.python.org/3/library/sqlite3.html): opening a SQLite database file, running SQL and saving changes, in `src/inspection_log.py`.
+- [`sqlite3`: placeholders](https://docs.python.org/3/library/sqlite3.html#sqlite3-placeholders): why values go into SQL through `?` placeholders and not by building the text by hand.
+- [SQLite: `CREATE TABLE`](https://www.sqlite.org/lang_createtable.html): defining the `inspections` table and its columns.
+- [SQLite: data types](https://www.sqlite.org/datatype3.html): what `INTEGER`, `REAL` and `TEXT` mean, and why dates are stored as text.
+- [SQLite: `SELECT`](https://www.sqlite.org/lang_select.html): reading rows back, with `ORDER BY`, `LIMIT` and `GROUP BY`.
+
 ## Image preprocessing
 
 - [NumPy: indexing and slicing](https://numpy.org/doc/stable/user/basics.indexing.html): cropping an image with `frame[y1:y2, x1:x2]` in `src/preprocess.py`.

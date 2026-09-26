@@ -5,7 +5,7 @@ Each frame goes through the same steps as the training photos:
 Each frame is also compared with the previous one to measure motion: while a hand or
 the cap is moving, frames can't be trusted. The answers and the "moving" flag go to
 CapDecider, which waits for still frames that agree and makes one decision per cap
-(see cap_decider.py).
+(see cap_decider.py). Every decision is saved in the database (see inspection_log.py).
 
 The window shows the cropped square, so you see exactly what the model sees:
     top:    this frame's answer and P(defective)
@@ -24,6 +24,7 @@ import numpy as np
 from camera import CAMERA_SOURCE, open_camera
 from cap_decider import CapDecider
 from classifier import IMAGE_SIZE, decide, load_model, probabilities
+from inspection_log import DB_PATH, log_decision, open_log
 from preprocess import crop_roi
 
 # Text colour for each answer, in BGR order (OpenCV's colour order)
@@ -67,6 +68,8 @@ def main():
     if not cap.isOpened():
         sys.exit(f"Could not open camera {CAMERA_SOURCE}.")
     print("Live inspection running. Click the window, then press q to quit.")
+    log = open_log()  # the database connection, open for the whole session
+    print(f"Saving decisions to {DB_PATH}")
 
     decider = CapDecider()
     totals = Counter()  # decisions so far, per class
@@ -90,8 +93,11 @@ def main():
         decision = decider.update(answer, moving)
         if decision is not None:
             last_decision, last_reason = decision, decider.reason
+            confidence = decider.agreement(decision)
+            log_decision(log, decision, confidence, last_reason)
             totals[decision] += 1
-            print(f"Cap #{sum(totals.values())}: {decision.upper()} (reason: {last_reason})")
+            print(f"Cap #{sum(totals.values())}: {decision.upper()} "
+                  f"(confidence {confidence:.2f}, reason: {last_reason}) - saved")
 
         preview = roi.copy()  # draw on a copy: the same clean-image habit as in capture.py
         height = preview.shape[0]
@@ -112,6 +118,7 @@ def main():
 
     cap.release()
     cv2.destroyAllWindows()
+    log.close()
 
 
 if __name__ == "__main__":
