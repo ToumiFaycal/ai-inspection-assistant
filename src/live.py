@@ -71,6 +71,7 @@ def main():
     decider = CapDecider()
     totals = Counter()  # decisions so far, per class
     last_decision = None
+    last_reason = None  # "vote" or "unsure"
     previous_small = None  # the previous frame, shrunk, to measure motion
 
     while True:
@@ -88,9 +89,9 @@ def main():
 
         decision = decider.update(answer, moving)
         if decision is not None:
-            last_decision = decision
+            last_decision, last_reason = decision, decider.reason
             totals[decision] += 1
-            print(f"Cap #{sum(totals.values())}: {decision.upper()}")
+            print(f"Cap #{sum(totals.values())}: {decision.upper()} (reason: {last_reason})")
 
         preview = roi.copy()  # draw on a copy: the same clean-image habit as in capture.py
         height = preview.shape[0]
@@ -99,6 +100,8 @@ def main():
         motion_color = (0, 200, 255) if moving else (255, 255, 255)  # orange while moving
         put_text(preview, f"motion {motion:.1f} ({'moving' if moving else 'still'})", (15, 110), 0.7, motion_color)
         if last_decision is not None:
+            if last_reason == "unsure":
+                put_text(preview, "unsure: check this cap by hand", (15, height - 100), 0.8, COLORS["defective"])
             put_text(preview, f"LAST CAP: {last_decision.upper()}", (15, height - 55), 1.3, COLORS[last_decision], 3)
         put_text(preview, f"good {totals['good']}   defective {totals['defective']}", (15, height - 18),
                  0.8, (255, 255, 255))
