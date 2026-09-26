@@ -7,7 +7,9 @@ the answers over time and makes one stable decision per cap:
     WAITING      the spot is empty, waiting for a cap
         |  a frame that isn't "empty" arrives
         v
-    COLLECTING   keep the last WINDOW answers, decide once one answer clearly wins
+    COLLECTING   keep the last WINDOW answers, decide once one answer clearly wins.
+        |        Votes only count while the picture is still: if something moves
+        |        (a hand, the cap sliding into place), the votes so far are thrown away.
         |  a cap answer wins                  -> report the decision, go to DECIDED
         |  "empty" wins (nothing really placed) -> back to WAITING
         v
@@ -16,7 +18,7 @@ the answers over time and makes one stable decision per cap:
         v
     WAITING      ready for the next cap
 
-Run this file on its own to watch it work on a made-up sequence of answers:
+Run this file on its own to watch it work on two made-up scenarios:
     python src/cap_decider.py
 """
 from collections import Counter, deque
@@ -44,8 +46,12 @@ class CapDecider:
         self.window = deque(maxlen=WINDOW)  # keeps only the last WINDOW answers
         self.empty_streak = 0  # how many "empty" answers in a row, right now
 
-    def update(self, answer):
-        """Feed one frame's answer. Returns the cap's decision when it's made, otherwise None."""
+    def update(self, answer, moving=False):
+        """Feed one frame's answer. Returns the cap's decision when it's made, otherwise None.
+
+        `moving` is True when the picture changed a lot since the previous frame
+        (measured in live.py), which means a hand or the cap is still moving.
+        """
         if answer == "empty":
             self.empty_streak += 1
         else:
@@ -58,6 +64,9 @@ class CapDecider:
                 self.state = "COLLECTING"
 
         elif self.state == "COLLECTING":
+            if moving:
+                self.window.clear()
+                return None
             self.window.append(answer)
             if len(self.window) == WINDOW:
                 winner, votes = majority(list(self.window))
@@ -75,28 +84,49 @@ class CapDecider:
         return None
 
 
-def demo():
-    """Feed a made-up sequence of answers and print what the decider does."""
-    sequence = (
-        ["empty"] * 10  # spot empty
-        + ["good", "defective", "defective", "good"]  # a hand brings the first cap
-        + ["defective"] * 20  # the cap sits on the spot
-        + ["empty"] * 12  # the cap is taken away
-        + ["defective", "good", "good"]  # a hand brings the second cap
-        + ["good"] * 20  # the cap sits on the spot
-        + ["empty"] * 12  # taken away
-    )
+def repeat(answer, count, moving=False):
+    """`count` identical frames, as (answer, moving) pairs. Example: repeat("empty", 10)."""
+    return [(answer, moving)] * count
+
+
+def run_scenario(title, frames, expected):
+    """Feed (answer, moving) pairs to a fresh decider and print every state change."""
+    print(f"\n=== {title} ===")
     decider = CapDecider()
     decisions = []
-    for frame_number, answer in enumerate(sequence, start=1):
+    for frame_number, (answer, moving) in enumerate(frames, start=1):
         previous_state = decider.state
-        decision = decider.update(answer)
+        decision = decider.update(answer, moving)
         if decider.state != previous_state:
-            print(f"frame {frame_number:3}: {answer:9} -> {previous_state} to {decider.state}")
+            motion = "(moving)" if moving else ""
+            print(f"frame {frame_number:3}: {answer:9} {motion:8} -> {previous_state} to {decider.state}")
         if decision is not None:
             decisions.append(decision)
             print(f"           CAP DECIDED: {decision.upper()}")
-    print(f"\nDecisions: {decisions}  (expected: ['defective', 'good'])")
+    print(f"Decisions: {decisions}  (expected: {expected})")
+
+
+def demo():
+    """Two made-up scenarios: caps placed quickly, and a good cap placed slowly."""
+    run_scenario(
+        "Two caps placed quickly",
+        repeat("empty", 10)  # spot empty
+        + [("good", False), ("defective", False), ("defective", False), ("good", False)]  # hand brings cap 1
+        + repeat("defective", 20)  # the cap sits on the spot
+        + repeat("empty", 12)  # the cap is taken away
+        + [("defective", False), ("good", False), ("good", False)]  # hand brings cap 2
+        + repeat("good", 20)  # the cap sits on the spot
+        + repeat("empty", 12),  # taken away
+        expected=["defective", "good"],
+    )
+    run_scenario(
+        "A good cap placed slowly (hand in view for 20 frames)",
+        repeat("empty", 10)  # spot empty
+        + repeat("defective", 20, moving=True)  # the moving hand makes frames look defective
+        + repeat("good", 20)  # hand gone, cap settled and still
+        + repeat("empty", 12),  # taken away
+        expected=["good"],
+    )
 
 
 if __name__ == "__main__":

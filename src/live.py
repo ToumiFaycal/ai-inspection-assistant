@@ -2,12 +2,14 @@
 
 Each frame goes through the same steps as the training photos:
     camera frame -> crop_roi (central square) -> model -> 3 probabilities -> decide -> answer
-The frame answers then go to CapDecider, which waits for them to agree and makes
-one decision per cap (see cap_decider.py).
+Each frame is also compared with the previous one to measure motion: while a hand or
+the cap is moving, frames can't be trusted. The answers and the "moving" flag go to
+CapDecider, which waits for still frames that agree and makes one decision per cap
+(see cap_decider.py).
 
 The window shows the cropped square, so you see exactly what the model sees:
     top:    this frame's answer and P(defective)
-    middle: the decider's state (WAITING / COLLECTING / DECIDED)
+    middle: the decider's state (WAITING / COLLECTING / DECIDED) and the motion level
     bottom: the last cap's decision and the totals so far
 
 Usage:
@@ -17,6 +19,7 @@ import sys
 from collections import Counter
 
 import cv2
+import numpy as np
 
 from camera import CAMERA_SOURCE, open_camera
 from cap_decider import CapDecider
@@ -26,6 +29,22 @@ from preprocess import crop_roi
 # Text colour for each answer, in BGR order (OpenCV's colour order)
 COLORS = {"good": (0, 180, 0), "defective": (0, 0, 255), "empty": (160, 160, 160)}
 FONT = cv2.FONT_HERSHEY_SIMPLEX
+
+# Average change per pixel between two frames (0-255) above which the picture counts
+# as "moving". A still scene measured about 1.3. Adjust from the numbers on screen.
+MOTION_THRESHOLD = 3.0
+
+
+def small_gray(image):
+    """Shrink an image to 160x160 grey, so comparing frames is fast and ignores tiny details."""
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return cv2.resize(gray, (160, 160)).astype(np.float32)  # float: see motion_between
+
+
+def motion_between(previous, current):
+    """Average brightness change per pixel between two small grey images (0 = identical)."""
+    # The images are floats, not uint8: with uint8, 3 - 5 would wrap around to 254.
+    return float(np.abs(current - previous).mean())
 
 
 def put_text(image, text, position, scale, color, thickness=2):
@@ -52,6 +71,7 @@ def main():
     decider = CapDecider()
     totals = Counter()  # decisions so far, per class
     last_decision = None
+    previous_small = None  # the previous frame, shrunk, to measure motion
 
     while True:
         ok, frame = cap.read()
@@ -60,7 +80,13 @@ def main():
             break
 
         answer, probs, roi = classify_frame(model, frame)
-        decision = decider.update(answer)
+
+        small = small_gray(roi)
+        motion = 0.0 if previous_small is None else motion_between(previous_small, small)
+        previous_small = small
+        moving = motion > MOTION_THRESHOLD
+
+        decision = decider.update(answer, moving)
         if decision is not None:
             last_decision = decision
             totals[decision] += 1
@@ -70,6 +96,8 @@ def main():
         height = preview.shape[0]
         put_text(preview, f"frame: {answer}  P(defective) = {probs['defective']:.2f}", (15, 35), 0.8, COLORS[answer])
         put_text(preview, decider.state, (15, 75), 0.8, (255, 255, 255))
+        motion_color = (0, 200, 255) if moving else (255, 255, 255)  # orange while moving
+        put_text(preview, f"motion {motion:.1f} ({'moving' if moving else 'still'})", (15, 110), 0.7, motion_color)
         if last_decision is not None:
             put_text(preview, f"LAST CAP: {last_decision.upper()}", (15, height - 55), 1.3, COLORS[last_decision], 3)
         put_text(preview, f"good {totals['good']}   defective {totals['defective']}", (15, height - 18),
