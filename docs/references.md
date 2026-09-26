@@ -7,6 +7,10 @@ Documentation and material consulted while building this project, grouped by top
 - [pathlib: `Path.mkdir`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.mkdir): creating the dataset folders (`parents`, `exist_ok`) in `src/capture.py`.
 - [datetime: `strftime` format codes](https://docs.python.org/3/library/datetime.html#format-codes): timestamped, collision-free photo file names in `src/capture.py`.
 
+- [Python tutorial: classes](https://docs.python.org/3/tutorial/classes.html): `CapDecider` in `src/cap_decider.py`, an object that remembers recent answers between camera frames.
+- [collections: `deque`](https://docs.python.org/3/library/collections.html#collections.deque): a list that keeps only the most recent items (the voting window).
+- [collections: `Counter`](https://docs.python.org/3/library/collections.html#collections.Counter): counting items, used for totals in `src/live.py` and one way to count votes.
+
 ## Camera capture
 
 - [OpenCV `cv::VideoCapture`](https://docs.opencv.org/4.x/d8/dfe/classcv_1_1VideoCapture.html): opening a webcam by index or a network stream by URL, capture backends (DirectShow, Media Foundation, FFmpeg).
