@@ -10,16 +10,12 @@ Usage:
 """
 from pathlib import Path
 
-from ultralytics import YOLO
+from classifier import CLASSES, DEFECT_THRESHOLD, IMAGE_SIZE, WEIGHTS, decide, load_model, probabilities
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data" / "caps_roi"
-WEIGHTS = PROJECT_ROOT / "runs" / "roi_square" / "weights" / "best.pt"  # the chosen model
 
 SPLIT = "val"  # "val" while choosing the threshold, "test" once at the very end
-DEFECT_THRESHOLD = 0.4  # answer "defective" when P(defective) >= this (chosen on val)
-
-CLASSES = ["good", "defective", "empty"]
 
 
 def predict_split(model, split):
@@ -33,22 +29,10 @@ def predict_split(model, split):
         files = sorted((DATA_DIR / split / true_class).glob("*.jpg"))
         if not files:
             continue
-        results = model.predict([str(f) for f in files], imgsz=224, verbose=False)
+        results = model.predict([str(f) for f in files], imgsz=IMAGE_SIZE, verbose=False)
         for path, result in zip(files, results): # zip() pairs each photo with its result
-            # result.names maps class number -> name, e.g. {0: "defective", 1: "empty", 2: "good"}
-            probs = {result.names[i]: float(p) for i, p in enumerate(result.probs.data.tolist())} 
-            rows.append((path, true_class, probs))
+            rows.append((path, true_class, probabilities(result)))
     return rows
-
-
-def decide(probs, threshold):
-    """Turn the three probabilities into one answer: "good", "defective" or "empty"."""
-    if probs["defective"] >= threshold:
-        return "defective"
-    elif probs["good"] > probs["empty"]:
-        return "good"
-    else:
-        return "empty"
 
 
 def confusion_matrix(rows, threshold):
@@ -118,7 +102,7 @@ def main():
     if SPLIT not in ("val", "test"):
         raise SystemExit(f"SPLIT must be 'val' or 'test', got {SPLIT!r}")
 
-    model = YOLO(str(WEIGHTS))
+    model = load_model()
     rows = predict_split(model, SPLIT)
     print(f"Model: {WEIGHTS}")
     print(f"Split: {SPLIT} ({len(rows)} photos), defect threshold: {DEFECT_THRESHOLD}")
