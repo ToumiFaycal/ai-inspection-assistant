@@ -1,18 +1,20 @@
-"""Tools the assistant can call: small, read-only questions to the inspection log.
+"""Tools the assistant can call: read-only questions to the inspection log, and a search
+through the inspection documents.
 
-The language model never reads the database itself. It asks for one of these functions
-by name, assistant.py runs it and hands the result back. So every number in an answer
-comes from here, not from the model's memory.
+The language model never reads the database or the documents itself. It asks for one of
+these functions by name, assistant.py runs it and hands the result back. So every number
+and every rule in an answer comes from here, not from the model's memory.
 
 Each tool:
   - has a docstring the model reads to decide when to use it, so keep it clear and precise,
-  - opens the log read-only, so the assistant can never change or delete anything,
+  - only reads (the log is opened read-only), so the assistant can never change anything,
   - returns plain data (numbers, text, lists, dicts).
 """
 import sqlite3
 from datetime import datetime
 
 from inspection_log import DB_PATH, count_by_decision
+from knowledge_base import KnowledgeBase
 
 
 def read_only_connection():
@@ -166,5 +168,42 @@ def list_caps_between(start: str, end: str, limit: int = 20) -> dict:
     finally:
         connection.close()
 
+
+MIN_SCORE = 0.35
+
+_knowledge_base = None  # built the first time search_documents is used (embedding takes a moment)
+
+
+def knowledge_base():
+    """Return the document search, building it on first use only."""
+    global _knowledge_base  # assign to the variable above, not to a new local one
+    if _knowledge_base is None:
+        _knowledge_base = KnowledgeBase()
+    return _knowledge_base
+
+
+def search_documents(question: str) -> dict:
+    """Search the inspection station's documents: the defect definitions, the inspection
+    procedure, the tuning notes (how the model was trained, its test results, why each
+    setting and threshold was chosen) and the known limitations. Use it for any question
+    about what counts as a defect, how to use the station, how it works, why a setting was
+    chosen, how accurate it is, or what it cannot do. Answer only from the sections it
+    returns, and cite each fact's source.
+
+    Args:
+      question (str): the question, or the topic to look up, e.g. "is a bent rim a defect"
+
+    Returns:
+      dict: {"found": True, "sections": [{"source": ..., "text": ...}, ...]} with the most relevant
+            sections, best first, or {"found": False, "message": ...} when nothing relevant was found
+    """
+
+    results = knowledge_base().search(question, top_k=3)
+    relevant = [r for r in results if r["score"] >= MIN_SCORE]
+    if not relevant:
+        return {"found": False, "message": "Nothing in the inspection documents matches this question."}
+    return {"found": True, "sections": [{"source": r["source"], "text": r["text"]} for r in relevant]}
+
+
 # The tools the assistant is allowed to use. Add each new tool function here.
-TOOLS = [count_decisions, current_time, summary_between, list_caps_between]
+TOOLS = [count_decisions, current_time, summary_between, list_caps_between, search_documents]
