@@ -4,6 +4,8 @@ Documentation and material consulted while building this project, grouped by top
 
 ## Python standard library
 
+- [venv: virtual environments](https://docs.python.org/3/library/venv.html): the project's own `.venv`, which keeps its packages separate from the rest of the computer.
+- [datetime: `fromisoformat`](https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat): checking that a date sent by the assistant is a real date, in `src/assistant_tools.py`.
 - [pathlib: `Path.mkdir`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.mkdir): creating the dataset folders (`parents`, `exist_ok`) in `src/capture.py`.
 - [datetime: `strftime` format codes](https://docs.python.org/3/library/datetime.html#format-codes): timestamped, collision-free photo file names in `src/capture.py`.
 
