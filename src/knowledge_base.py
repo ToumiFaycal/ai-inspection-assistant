@@ -6,14 +6,22 @@ it comes from, so that the assistant's answers can cite their source:
     {"source": "Defect definitions > Scratches",
      "text": "A cap is defective when its top face has clear scratches, or many scratches. ..."}
 
-Run this file on its own to see the sections it finds:
+Step 2: turn text into embeddings, lists of 768 numbers that capture its meaning, using a
+small local model (embeddinggemma in Ollama). Texts with similar meanings get similar
+numbers, and cosine similarity measures how close two of them are.
+
+Run this file on its own to see the sections and a few similarity scores:
     python src/knowledge_base.py
 """
 from collections import Counter
 from pathlib import Path
 
+import numpy as np
+import ollama
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 KNOWLEDGE_DIR = PROJECT_ROOT / "knowledge"
+EMBED_MODEL = "embeddinggemma"  # a small model that only turns text into numbers (it can't chat)
 
 
 def make_section(title, heading, lines):
@@ -58,6 +66,24 @@ def load_sections():
     return sections
 
 
+def embed(texts):
+    """Turn a list of texts into embeddings: a NumPy array with one row of 768 numbers per text."""
+    response = ollama.embed(model=EMBED_MODEL, input=texts)
+    return np.array(response.embeddings)
+
+
+def section_to_embed(section):
+    """The text used to embed a section: its source label, then its text.
+    Measured on 10 test questions, adding the label found the right section first more often."""
+    return f"{section['source']}\n{section['text']}"
+
+
+def cosine_similarity(a, b):
+    """How close two embeddings are in meaning: 1.0 = same direction (same meaning),
+    around 0 = unrelated. `a` and `b` are NumPy arrays of the same length."""
+    return float((a @ b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+
 def main():
     sections = load_sections()
     per_document = Counter(section["source"].split(" > ")[0] for section in sections)
@@ -71,6 +97,14 @@ def main():
     if sections:
         example = sections[0]
         print(f"\nExample:\n  source: {example['source']}\n  text:   {example['text'][:200]}...")
+
+    print("\nEmbeddings (the first call can take ~15 s while Ollama loads the model):")
+    phrases = ["A crushed cap", "A cap with a deformed rim", "The weather is nice today"]
+    vectors = embed(phrases)
+    print(f"  each text becomes {vectors.shape[1]} numbers, e.g. '{phrases[0]}' starts with {np.round(vectors[0, :5], 3)}")
+    for i, j in [(0, 1), (0, 2)]:
+        score = cosine_similarity(vectors[i], vectors[j])
+        print(f"  '{phrases[i]}' vs '{phrases[j]}': {score}")
 
 
 if __name__ == "__main__":
