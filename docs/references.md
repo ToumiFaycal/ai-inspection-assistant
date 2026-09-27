@@ -44,6 +44,13 @@ Documentation and material consulted while building this project, grouped by top
 - [SQLite: data types](https://www.sqlite.org/datatype3.html): what `INTEGER`, `REAL` and `TEXT` mean, and why dates are stored as text.
 - [SQLite: `SELECT`](https://www.sqlite.org/lang_select.html): reading rows back, with `ORDER BY`, `LIMIT` and `GROUP BY`.
 
+## AI assistant
+
+- [Ollama for Windows](https://ollama.com/download/windows): the program that runs language models locally, on this laptop.
+- [Ollama: Qwen3 model page](https://ollama.com/library/qwen3): the `qwen3:8b` model used by the assistant (sizes and capabilities).
+- [Ollama: tool calling](https://docs.ollama.com/capabilities/tool-calling): how a model asks the program to run a function and uses the result in its answer.
+- [ollama-python](https://github.com/ollama/ollama-python): the Python library for talking to Ollama.
+
 ## Image preprocessing
 
 - [NumPy: indexing and slicing](https://numpy.org/doc/stable/user/basics.indexing.html): cropping an image with `frame[y1:y2, x1:x2]` in `src/preprocess.py`.
