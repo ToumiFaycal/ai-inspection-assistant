@@ -10,7 +10,10 @@ Step 2: turn text into embeddings, lists of 768 numbers that capture its meaning
 small local model (embeddinggemma in Ollama). Texts with similar meanings get similar
 numbers, and cosine similarity measures how close two of them are.
 
-Run this file on its own to see the sections and a few similarity scores:
+Step 3: search. KnowledgeBase embeds every section once (the "index", kept in memory),
+then for each question finds the sections whose meaning is closest to it.
+
+Run this file on its own to see the sections, a few similarity scores and example searches:
     python src/knowledge_base.py
 """
 from collections import Counter
@@ -84,6 +87,25 @@ def cosine_similarity(a, b):
     return float((a @ b) / (np.linalg.norm(a) * np.linalg.norm(b)))
 
 
+class KnowledgeBase:
+    """The inspection documents, split and embedded once, ready to be searched."""
+
+    def __init__(self):
+        self.sections = load_sections()
+        # The index: one row of 768 numbers per section, in the same order as self.sections.
+        self.vectors = embed([section_to_embed(section) for section in self.sections])
+
+    def search(self, question, top_k=3):
+        """Return the `top_k` sections closest in meaning to `question`, best first,
+        as [{"source": ..., "text": ..., "score": ...}, ...]."""
+        question_vector = embed([question])[0]
+        results = []
+        for section, vector in zip(self.sections, self.vectors):
+            score = cosine_similarity(question_vector, vector)
+            results.append({"source": section["source"], "text": section["text"], "score": round(score, 3)})
+        return sorted(results, key=lambda result: result["score"], reverse=True)[:top_k]
+
+
 def main():
     sections = load_sections()
     per_document = Counter(section["source"].split(" > ")[0] for section in sections)
@@ -105,6 +127,15 @@ def main():
     for i, j in [(0, 1), (0, 2)]:
         score = cosine_similarity(vectors[i], vectors[j])
         print(f"  '{phrases[i]}' vs '{phrases[j]}': {score}")
+
+    print("\nSearch:")
+    knowledge = KnowledgeBase()
+    for question in ["Is a cap with a slightly squashed edge OK?",
+                     "Why is the defect threshold 0.4?",
+                     "What is the capital of France?"]:
+        print(f"\n  {question}")
+        for result in knowledge.search(question) or []:
+            print(f"    {result['score']:.3f}  {result['source']}")
 
 
 if __name__ == "__main__":

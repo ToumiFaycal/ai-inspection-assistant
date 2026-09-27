@@ -7,6 +7,8 @@ Documentation and material consulted while building this project, grouped by top
 - [venv: virtual environments](https://docs.python.org/3/library/venv.html): the project's own `.venv`, which keeps its packages separate from the rest of the computer.
 - [datetime: `fromisoformat`](https://docs.python.org/3/library/datetime.html#datetime.datetime.fromisoformat): checking that a date sent by the assistant is a real date, in `src/assistant_tools.py`.
 - [String methods](https://docs.python.org/3/library/stdtypes.html#string-methods): `splitlines`, `startswith`, `strip` and `join`, used to split the inspection documents into sections in `src/knowledge_base.py`.
+- [Sorting how-to](https://docs.python.org/3/howto/sorting.html): `sorted` with `key=` and `reverse=True`, used to rank document sections by score.
+- [`zip`](https://docs.python.org/3/library/functions.html#zip): going through two lists side by side (the sections and their embeddings).
 - [pathlib: `Path.mkdir`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.mkdir): creating the dataset folders (`parents`, `exist_ok`) in `src/capture.py`.
 - [datetime: `strftime` format codes](https://docs.python.org/3/library/datetime.html#format-codes): timestamped, collision-free photo file names in `src/capture.py`.
 
