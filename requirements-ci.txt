@@ -1,0 +1,6 @@
+# Only what the automated tests need, for GitHub's servers (no camera, no GPU, no AI models).
+# The full project environment is in requirements.txt.
+numpy==2.5.3
+opencv-python-headless==5.0.0.93  # OpenCV without windows or camera support, for servers
+ollama==0.6.2  # imported by the assistant code (the tests never call the Ollama program)
+pytest==9.1.1

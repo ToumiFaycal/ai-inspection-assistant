@@ -72,6 +72,11 @@ Documentation and material consulted while building this project, grouped by top
 - [pytest: temporary folders (`tmp_path`)](https://docs.pytest.org/en/stable/how-to/tmp_path.html): a fresh empty folder for each test, so tests never touch real files.
 - [pytest: `monkeypatch`](https://docs.pytest.org/en/stable/how-to/monkeypatch.html): pointing the tools at the sample log during a test, and putting everything back afterwards.
 
+## Automatic checks on GitHub (CI)
+
+- [GitHub Actions: understanding the basics](https://docs.github.com/en/actions/get-started/understand-github-actions): workflows, jobs and steps, the pieces of `.github/workflows/tests.yml`.
+- [GitHub Actions: building and testing Python](https://docs.github.com/en/actions/tutorials/build-and-test-code/python): installing Python and the dependencies, then running the tests on GitHub's servers.
+
 ## Image preprocessing
 
 - [NumPy: indexing and slicing](https://numpy.org/doc/stable/user/basics.indexing.html): cropping an image with `frame[y1:y2, x1:x2]` in `src/preprocess.py`.
