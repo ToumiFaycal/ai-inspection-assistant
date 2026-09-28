@@ -68,6 +68,9 @@ Documentation and material consulted while building this project, grouped by top
 
 - [pytest: getting started](https://docs.pytest.org/en/stable/getting-started.html): writing test functions and running them all with one command.
 - [pytest: assertions](https://docs.pytest.org/en/stable/how-to/assert.html): how `assert` checks a result, and how pytest explains a failure.
+- [pytest: fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html): preparing what a test needs, like the small sample inspection log in `tests/conftest.py`.
+- [pytest: temporary folders (`tmp_path`)](https://docs.pytest.org/en/stable/how-to/tmp_path.html): a fresh empty folder for each test, so tests never touch real files.
+- [pytest: `monkeypatch`](https://docs.pytest.org/en/stable/how-to/monkeypatch.html): pointing the tools at the sample log during a test, and putting everything back afterwards.
 
 ## Image preprocessing
 
