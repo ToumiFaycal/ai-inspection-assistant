@@ -1,6 +1,7 @@
 opencv-python==5.0.0.93
 ultralytics==8.4.161
 ollama==0.6.2  # Python library for the local Ollama program (install Ollama itself from ollama.com)
+pytest==9.1.1  # automated tests: run them with "python -m pytest"
 
 # PyTorch GPU build (CUDA 13.0). On Windows a plain `pip install torch` gives the
 # CPU-only build, so install these two first, from PyTorch's own server:

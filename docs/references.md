@@ -64,6 +64,11 @@ Documentation and material consulted while building this project, grouped by top
 - [Ollama: EmbeddingGemma model page](https://ollama.com/library/embeddinggemma): the `embeddinggemma` model used to embed the documents and the questions.
 - [NumPy `dot`](https://numpy.org/doc/stable/reference/generated/numpy.dot.html) and [`linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html): the dot product and vector length used to compute cosine similarity.
 
+## Automated tests
+
+- [pytest: getting started](https://docs.pytest.org/en/stable/getting-started.html): writing test functions and running them all with one command.
+- [pytest: assertions](https://docs.pytest.org/en/stable/how-to/assert.html): how `assert` checks a result, and how pytest explains a failure.
+
 ## Image preprocessing
 
 - [NumPy: indexing and slicing](https://numpy.org/doc/stable/user/basics.indexing.html): cropping an image with `frame[y1:y2, x1:x2]` in `src/preprocess.py`.
