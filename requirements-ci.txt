@@ -4,3 +4,5 @@ numpy==2.5.3
 opencv-python-headless==5.0.0.93  # OpenCV without windows or camera support, for servers
 ollama==0.6.2  # imported by the assistant code (the tests never call the Ollama program)
 pytest==9.1.1
+fastapi==0.141.1  # to test the web interface (the tests don't need a real server)
+httpx2==2.13.1  # used by FastAPI's test client to send requests to the app

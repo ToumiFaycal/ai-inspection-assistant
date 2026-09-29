@@ -2,6 +2,9 @@ opencv-python==5.0.0.93
 ultralytics==8.4.161
 ollama==0.6.2  # Python library for the local Ollama program (install Ollama itself from ollama.com)
 pytest==9.1.1  # automated tests: run them with "python -m pytest"
+fastapi==0.141.1  # the web interface (API) in src/api.py
+uvicorn==0.54.0  # the web server that runs it
+httpx2==2.13.1  # used by FastAPI's test client (tests/test_api.py)
 
 # PyTorch GPU build (CUDA 13.0). On Windows a plain `pip install torch` gives the
 # CPU-only build, so install these two first, from PyTorch's own server:

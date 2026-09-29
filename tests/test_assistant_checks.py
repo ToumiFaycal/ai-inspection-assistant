@@ -12,14 +12,20 @@ def test_find_citations_returns_what_is_inside_the_brackets():
 
 def test_answer_without_citations_has_none():
     assert find_citations("The defect rate yesterday was 66.7%.") == []
+
+
 def test_unverified_citations_keeps_only_the_unknown_ones():
     citations = ["Defect definitions > Scratches", "Defect definitions > Storage"]
     sources = {"Defect definitions > Scratches"}
     assert unverified_citations(citations, sources) == ["Defect definitions > Storage"]
+
+
 def test_every_citation_is_verified_when_all_were_returned():
     citations = ["Defect definitions > Scratches", "Defect definitions > Storage"]
     sources = {"Defect definitions > Scratches", "Defect definitions > Storage"}
     assert unverified_citations(citations, sources) == []
+
+
 def test_returned_sources_only_comes_from_document_searches():
     tool_log = [
         ("count_decisions", {"total": 6, "good": 2, "defective": 4}),

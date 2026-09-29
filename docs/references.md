@@ -77,6 +77,15 @@ Documentation and material consulted while building this project, grouped by top
 - [GitHub Actions: understanding the basics](https://docs.github.com/en/actions/get-started/understand-github-actions): workflows, jobs and steps, the pieces of `.github/workflows/tests.yml`.
 - [GitHub Actions: building and testing Python](https://docs.github.com/en/actions/tutorials/build-and-test-code/python): installing Python and the dependencies, then running the tests on GitHub's servers.
 
+## Web interface (API)
+
+- [FastAPI: first steps](https://fastapi.tiangolo.com/tutorial/first-steps/): turning Python functions into web endpoints, and the interactive `/docs` page.
+- [FastAPI: query parameters](https://fastapi.tiangolo.com/tutorial/query-params/): the `?start=...&end=...` part of `/summary` and `/caps`.
+- [FastAPI: request body](https://fastapi.tiangolo.com/tutorial/body/): receiving `{"question": "..."}` in `/ask`, described with a Pydantic model.
+- [FastAPI: handling errors](https://fastapi.tiangolo.com/tutorial/handling-errors/): answering "400 Bad Request" for a malformed date with `HTTPException`.
+- [FastAPI: testing](https://fastapi.tiangolo.com/tutorial/testing/): calling the API from tests with `TestClient`, without starting a server.
+- [Uvicorn](https://uvicorn.dev/): the web server that runs the API.
+
 ## Image preprocessing
 
 - [NumPy: indexing and slicing](https://numpy.org/doc/stable/user/basics.indexing.html): cropping an image with `frame[y1:y2, x1:x2]` in `src/preprocess.py`.
