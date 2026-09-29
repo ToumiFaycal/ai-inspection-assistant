@@ -185,10 +185,11 @@ def knowledge_base():
 def search_documents(question: str) -> dict:
     """Search the inspection station's documents: the defect definitions, the inspection
     procedure, the tuning notes (how the model was trained, its test results, why each
-    setting and threshold was chosen) and the known limitations. Use it for any question
-    about what counts as a defect, how to use the station, how it works, why a setting was
-    chosen, how accurate it is, or what it cannot do. Answer only from the sections it
-    returns, and cite each fact's source.
+    setting and threshold was chosen), the known limitations, and about this project (who
+    created and trained the assistant and the cap model, when and why the project was made).
+    Use it for any question about what counts as a defect, how to use the station, how it
+    works, why a setting was chosen, how accurate it is, what it cannot do, or who made it.
+    Answer only from the sections it returns, and cite each fact's source.
 
     Args:
       question (str): the question, or the topic to look up, e.g. "is a bent rim a defect"

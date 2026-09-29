@@ -31,7 +31,7 @@ Every number below comes from running the code in this repository.
 Both misses are photos of the same cap, whose rim is only slightly bent. The other 3 photos of that cap were caught. In quality-control terms, the defective class has a recall of 92% (share of defective caps caught) and a precision of 100% (share of rejected caps that really were defective).
 
 **Assistant.**
-- **Exam.** 31 questions with known answers, graded automatically by code. They cover numbers from a demo log, rules from the documents, questions the documents don't answer, and off-topic questions. It got full marks on each of the 8 recorded runs.
+- **Exam.** 35 questions with known answers, graded automatically by code. They cover numbers from a demo log, rules from the documents, questions the documents don't answer, off-topic questions, and questions about the project itself (who built it, when and why). Over 3 runs it scored 35, 34 and 35 out of 35. The one miss was a correct refusal ("I'm here to help with the inspection station, not to write poems") that the grader didn't recognise, because it looks for set phrases such as "can only" or "cannot".
 - **Invented sources.** With instructions alone, the assistant invented a source in 10 of 20 answers. With checks in code, it invented none (0 of 20). The details are in *How it was built* below.
 
 **Automated tests.** 33 tests run on GitHub after every change. The badge at the top shows whether they currently pass.
@@ -83,7 +83,7 @@ flowchart TB
 
 The log is opened read-only, so the assistant can never change it.
 
-**6. Document search** ([knowledge_base.py](src/knowledge_base.py), [knowledge/](knowledge/)). Four short documents describe the station: defect definitions, the inspection procedure, tuning notes and known limitations. They are split into 39 sections. A second, smaller model (EmbeddingGemma, from Google, also run by Ollama) turns each section into an *embedding*, a list of 768 numbers that describes its meaning. A question is turned into numbers the same way, and the 3 sections with the closest meaning are handed to the assistant. If no section is close enough (a score below 0.35), the search reports that nothing was found, so an off-topic question isn't answered from unrelated text. This way of answering from your own documents is called retrieval-augmented generation (RAG).
+**6. Document search** ([knowledge_base.py](src/knowledge_base.py), [knowledge/](knowledge/)). Five short documents describe the station: defect definitions, the inspection procedure, tuning notes, known limitations, and one about the project itself (who built it, when and why). They are split into 44 sections. A second, smaller model (EmbeddingGemma, from Google, also run by Ollama) turns each section into an *embedding*, a list of 768 numbers that describes its meaning. A question is turned into numbers the same way, and the 3 sections with the closest meaning are handed to the assistant. If no section is close enough (a score below 0.35), the search reports that nothing was found, so an off-topic question isn't answered from unrelated text. This way of answering from your own documents is called retrieval-augmented generation (RAG).
 
 **7. Citation check** ([assistant.py](src/assistant.py)). Every rule taken from the documents must end with its source, for example `[Defect definitions > Scratches]`. After the assistant answers, the code checks the answer:
 - If the assistant didn't look anything up, or cited a section that no search returned, the answer is thrown away. The assistant is then asked again, with the right sections given to it.
@@ -97,7 +97,7 @@ The log is opened read-only, so the assistant can never change it.
 
 FastAPI also builds a page where each endpoint can be tried from the browser.
 
-**9. Tests and exam** ([tests/](tests/), [evaluate_assistant.py](src/evaluate_assistant.py)). The automated tests check each piece on small made-up examples. They run on GitHub after every push; this is called continuous integration, or CI. The assistant exam asks its 31 questions against a demo log built in a temporary folder, so the real log is never touched.
+**9. Tests and exam** ([tests/](tests/), [evaluate_assistant.py](src/evaluate_assistant.py)). The automated tests check each piece on small made-up examples. They run on GitHub after every push; this is called continuous integration, or CI. The assistant exam asks its 35 questions against a demo log built in a temporary folder, so the real log is never touched.
 
 ## How it was built: problems met and how they were fixed
 
@@ -128,7 +128,7 @@ The lesson: an instruction in the prompt is a request, not a guarantee. Anything
 - **Only the top is seen.** Damage on the side or underneath (tamper ring, threads, inside) can't be detected.
 - **The setup must not change.** The model knows one camera position, one lamp and no daylight. The phone's automatic colour adjustment can also tint the picture.
 - **A small dataset.** 336 photos of about 28 caps, mostly blue and red. The practice photos had mostly obvious defects, so the 40% threshold was chosen on easier photos than the final test.
-- **An exam written by its builders.** The exam questions were written while building the assistant, by people who knew how it works. Full marks show that it does what it was designed to do, not that it will handle any question. Answers can also vary from one run to the next.
+- **An exam written by its builders.** The exam questions were written while building the assistant, by people who knew how it works. Full marks show that it does what it was designed to do, not that it will handle any question. Answers can also vary from one run to the next, and the grader only looks for set words, so it can reject a correct answer worded in an unexpected way (it happened once, see *Results*).
 - **A learning project, not a product.** It shows how the pieces of an inspection system fit together. It is not meant for a real factory.
 
 The full list is in [knowledge/known_limitations.md](knowledge/known_limitations.md). It is one of the documents the assistant answers from, so you can also ask the assistant about its own limits.

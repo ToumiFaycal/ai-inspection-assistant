@@ -108,4 +108,10 @@ CASES = [
      "must_include_numbers": [40], "must_cite_one_of": ["Defect definitions > Scratches"]},
     {"category": "mixed", "question": "How many caps were inspected today, and what should I do with an unsure reject?",
      "must_include_numbers": [3], "must_cite_one_of": ["Inspection procedure > Unsure rejects"]},
+    # --- station info: questions about the station itself ---
+    {"category": "station info", "question": "Who trained you?", "must_include": ["Qwen"], "must_cite_one_of": ["About this project > Who trained the assistant's language model", "About this project > Who created the assistant"]},
+    {"category": "station info", "question": "When did this project start?", "must_include_numbers": [23], "must_cite_one_of": ["About this project > When the project started"]},
+    {"category": "station info", "question": "Why was the project built?", "must_include_one_of": ["to learn", "concepts"], "must_cite_one_of": ["About this project > Why the project was built"]},
+    {"category": "station info", "question": "Who trained the camera model to detect caps?", "must_include_one_of": ["YOLO26 nano from Ultralytics", "ImageNet", "The Honored One"], "must_cite_one_of": ["About this project > Who trained the cap model"]},
+
 ]
